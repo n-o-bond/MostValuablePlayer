@@ -1,17 +1,13 @@
 package com.example.mostvaluableplayer.model.player;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class BasketballPlayer extends Player {
-
     private int scoredPoints;
     private int rebounds;
     private int assists;
-
 }

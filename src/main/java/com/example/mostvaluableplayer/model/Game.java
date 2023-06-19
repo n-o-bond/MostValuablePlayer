@@ -14,7 +14,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class Game {
-
     private List<Team> teams = new ArrayList<>();
     private Set<Player> players = new HashSet<>();
     private Team winner;

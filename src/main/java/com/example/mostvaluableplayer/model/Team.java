@@ -16,6 +16,8 @@ public class Team {
     private String name;
     private List<Player> players = new ArrayList<>();
 
+    int scoredPoints;
+
     public void addPlayer(Player player){
         players.add(player);
         player.setTeamName(this.name);

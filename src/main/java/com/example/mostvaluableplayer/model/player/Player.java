@@ -1,19 +1,13 @@
 package com.example.mostvaluableplayer.model.player;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
-public class Player {
-
-    String name;
-    String nickname;
-    int number;
-    String teamName;
-    int additionalRatingPoints;
-
+@EqualsAndHashCode
+public abstract class Player {
+    protected String name;
+    protected String nickname;
+    protected int number;
+    protected String teamName;
+    protected int ratingPoints;
 }
