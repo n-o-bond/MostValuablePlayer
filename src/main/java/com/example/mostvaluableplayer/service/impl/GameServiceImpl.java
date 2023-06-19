@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Service("GameServiceImpl")
 public class GameServiceImpl implements GameService {
 
-    public Team createTeam(List<Player> players, String teamName) {
-        List<Player> playerList = players.stream()
+    public Team createTeam(List<? extends Player> players, String teamName) {
+        List<? extends Player> playerList = players.stream()
                 .filter(p -> p.getTeamName().equals(teamName))
                 .toList();
         int scoredPoints =  playerList.stream()
@@ -30,7 +30,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game createGame(List<Team> teams) {
-        Set<Player> players = teams.stream()
+        Set<? extends Player> players = teams.stream()
                 .flatMap(team -> team.getPlayers().stream())
                 .collect(Collectors.toSet());
 
@@ -41,7 +41,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void determineWinnerTeam(Game game) {
+    public Team determineWinnerTeam(Game game) {
         List<Team> teams = game.getTeams();
         Team winner = teams.stream()
                 .max(Comparator.comparingInt(Team::getScoredPoints))
@@ -49,9 +49,11 @@ public class GameServiceImpl implements GameService {
         game.setWinner(winner);
 
         addAdditionalRatingPoints(winner);
+        return winner;
     }
 
-    private static void addAdditionalRatingPoints(Team winner) {
+    @Override
+    public void addAdditionalRatingPoints(Team winner) {
         winner.getPlayers()
                 .forEach(player -> player.setRatingPoints(player.getRatingPoints()+10));
     }

@@ -10,5 +10,5 @@ public interface TournamentService {
 
     Tournament createTournament(List<Game> games);
 
-    Player determineMostValuablePlayer(List<Player> players);
+    Player determineMostValuablePlayer(List<? extends Player> players);
 }

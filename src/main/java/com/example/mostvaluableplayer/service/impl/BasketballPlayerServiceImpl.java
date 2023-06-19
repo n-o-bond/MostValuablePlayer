@@ -29,35 +29,44 @@ public class BasketballPlayerServiceImpl implements PlayerService<BasketballPlay
             List<CSVRecord> csvRecords = parser.getRecords();
 
             for (CSVRecord record : csvRecords) {
-                players.add(
-                        playerWithCSVFile(
-                                record.get(0), // name
-                                record.get(1), // nickname
-                                Integer.parseInt(record.get(2)), // number
-                                record.get(3), // teamName
-                                Integer.parseInt(record.get(4)), // scoredPoints
-                                Integer.parseInt(record.get(5)), // rebounds
-                                Integer.parseInt(record.get(6)) //assists
-                        ));
+                try {
+                    players.add(
+                            playerWithCSVFile(
+                                    record.get(0), // name
+                                    record.get(1), // nickname
+                                    Integer.parseInt(record.get(2)), // number
+                                    record.get(3), // teamName
+                                    Integer.parseInt(record.get(4)), // scoredPoints
+                                    Integer.parseInt(record.get(5)), // rebounds
+                                    Integer.parseInt(record.get(6)) //assists
+                            ));
+                } catch (NumberFormatException e) {
+                    throw new FailedParsingFileException("Failed to parse CSV file: Invalid number format in the CSV record");
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    throw new FailedParsingFileException("Failed to parse CSV file: Missing fields in the CSV record");
+                }
             }
 
+        } catch (IllegalArgumentException e){
+            throw new FailedParsingFileException("Failed to parse CSV file: Illegal CSV record");
         } catch (IOException e) {
-            throw new FailedParsingFileException("Failed to parse CSV file");
+            throw new FailedParsingFileException("Failed to access CSV file");
         }
 
         return Collections.unmodifiableList(players);
     }
 
     private BasketballPlayer playerWithCSVFile(String name, String nickname, int number, String teamName, int scoredPoints, int rebounds, int assists) {
-       BasketballPlayer basketballPlayer = new BasketballPlayer();
-       basketballPlayer.setName(name);
-       basketballPlayer.setNickname(nickname);
-       basketballPlayer.setNumber(number);
-       basketballPlayer.setTeamName(teamName);
-       basketballPlayer.setScoredPoints(scoredPoints);
-       basketballPlayer.setRebounds(rebounds);
-       basketballPlayer.setAssists(assists);
-       return basketballPlayer;
+        BasketballPlayer basketballPlayer = new BasketballPlayer();
+        basketballPlayer.setName(name);
+        basketballPlayer.setNickname(nickname);
+        basketballPlayer.setNumber(number);
+        basketballPlayer.setTeamName(teamName);
+        basketballPlayer.setScoredPoints(scoredPoints);
+        basketballPlayer.setRebounds(rebounds);
+        basketballPlayer.setAssists(assists);
+        ratingPointsCount(basketballPlayer);
+        return basketballPlayer;
     }
 
     @Override

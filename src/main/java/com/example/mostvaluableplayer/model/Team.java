@@ -1,31 +1,19 @@
 package com.example.mostvaluableplayer.model;
 
 import com.example.mostvaluableplayer.model.player.Player;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @NoArgsConstructor
 public class Team {
-
     private String name;
-    private List<Player> players = new ArrayList<>();
+    private List<? extends Player> players = new ArrayList<>();
 
     int scoredPoints;
-
-    public void addPlayer(Player player){
-        players.add(player);
-        player.setTeamName(this.name);
-    }
-
-    public void removePlayer(Player player){
-        players.remove(player);
-        player.setTeamName(null);
-    }
-
-}
+   }

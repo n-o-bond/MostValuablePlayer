@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface GameService {
 
-    Team createTeam(List<Player> players, String teamName);
+    Team createTeam(List<? extends Player> players, String teamName);
 
     Game createGame(List<Team> teams);
 
-    void determineWinnerTeam(Game game);
+    Team determineWinnerTeam(Game game);
+
+    void addAdditionalRatingPoints(Team winner);
 }

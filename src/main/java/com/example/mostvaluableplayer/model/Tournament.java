@@ -12,8 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class Tournament {
-
     private List<Game> games = new ArrayList<>();
-    private List<Player> players = new ArrayList<>();
+    private List<? extends Player> players = new ArrayList<>();
     private Player mostValuablePlayer;
 }

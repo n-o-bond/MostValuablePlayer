@@ -28,33 +28,42 @@ public class HandballPlayerServiceImpl implements PlayerService<HandballPlayer> 
             List<CSVRecord> csvRecords = parser.getRecords();
 
             for (CSVRecord record : csvRecords) {
-                players.add(
-                        playerWithCSVFile(
-                                record.get(0), // name
-                                record.get(1), // nickname
-                                Integer.parseInt(record.get(2)), // number
-                                record.get(3), // teamName
-                                Integer.parseInt(record.get(4)), // goals made
-                                Integer.parseInt(record.get(5)) // goals received
-                        ));
+                try {
+                    players.add(
+                            playerWithCSVFile(
+                                    record.get(0), // name
+                                    record.get(1), // nickname
+                                    Integer.parseInt(record.get(2)), // number
+                                    record.get(3), // teamName
+                                    Integer.parseInt(record.get(4)), // goals made
+                                    Integer.parseInt(record.get(5)) // goals received
+                            ));
+                } catch (NumberFormatException e) {
+                    throw new FailedParsingFileException("Failed to parse CSV file: Invalid number format in the CSV record");
+                }  catch (ArrayIndexOutOfBoundsException e) {
+                    throw new FailedParsingFileException("Failed to parse CSV file: Missing fields in the CSV record");
+                }
             }
 
+        } catch (IllegalArgumentException e){
+            throw new FailedParsingFileException("Failed to parse CSV file: Illegal CSV record");
         } catch (IOException e) {
-            throw new FailedParsingFileException("Failed to parse CSV file");
+            throw new FailedParsingFileException("Failed to access CSV file");
         }
 
         return Collections.unmodifiableList(players);
     }
 
     private HandballPlayer playerWithCSVFile(String name, String nickname, int number, String teamName, int goalsMade, int goalsReceived) {
-    HandballPlayer handballPlayer = new HandballPlayer();
-    handballPlayer.setName(name);
-    handballPlayer.setNickname(nickname);
-    handballPlayer.setNumber(number);
-    handballPlayer.setTeamName(teamName);
-    handballPlayer.setGoalsMade(goalsMade);
-    handballPlayer.setGoalsReceived(goalsReceived);
-    return handballPlayer;
+        HandballPlayer handballPlayer = new HandballPlayer();
+        handballPlayer.setName(name);
+        handballPlayer.setNickname(nickname);
+        handballPlayer.setNumber(number);
+        handballPlayer.setTeamName(teamName);
+        handballPlayer.setGoalsMade(goalsMade);
+        handballPlayer.setGoalsReceived(goalsReceived);
+        ratingPointsCount(handballPlayer);
+        return handballPlayer;
     }
 
     @Override

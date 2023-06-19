@@ -17,7 +17,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public Tournament createTournament(List<Game> games) {
-        List<Player> players = games.stream()
+        List<? extends Player> players = games.stream()
                 .flatMap(game -> game.getPlayers().stream())
                 .toList();
         Tournament tournament = new Tournament();
@@ -27,7 +27,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Player determineMostValuablePlayer(List<Player> players) {
+    public Player determineMostValuablePlayer(List<? extends Player> players) {
         Optional<Player> playerWithMaxRatingPoints = players.stream()
                 .collect(Collectors.groupingBy(Player::getNickname, Collectors.summingInt(Player::getRatingPoints)))
                 .entrySet().stream()
