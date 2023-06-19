@@ -1,13 +1,11 @@
 package com.example.mostvaluableplayer.service.impl;
 
-import com.example.mostvaluableplayer.exception.CustomException;
-import com.example.mostvaluableplayer.model.Game;
+import com.example.mostvaluableplayer.exception.FailedParsingFileException;
 import com.example.mostvaluableplayer.model.player.HandballPlayer;
 import com.example.mostvaluableplayer.service.PlayerService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +40,7 @@ public class HandballPlayerServiceImpl implements PlayerService<HandballPlayer> 
             }
 
         } catch (IOException e) {
-            throw new CustomException("Failed to parse CSV file", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new FailedParsingFileException("Failed to parse CSV file");
         }
 
         return Collections.unmodifiableList(players);
@@ -62,14 +60,6 @@ public class HandballPlayerServiceImpl implements PlayerService<HandballPlayer> 
     @Override
     public void ratingPointsCount(HandballPlayer handballPlayer) {
         int additionalRatingPoints = handballPlayer.getGoalsMade() * 2 - handballPlayer.getGoalsReceived();
-        handballPlayer.setAdditionalRatingPoints(additionalRatingPoints);
-    }
-
-    @Override
-    public void addRatingPointsForWinners(Game game) {
-        game.getPlayers()
-                .stream()
-                .filter(player -> player.getTeamName().equals(game.getWinner().getName()))
-                .forEach(player -> player.setAdditionalRatingPoints(10));
+        handballPlayer.setRatingPoints(additionalRatingPoints);
     }
 }

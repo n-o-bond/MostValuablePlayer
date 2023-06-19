@@ -12,6 +12,4 @@ public interface PlayerService<T extends Player> {
     List<T> parseUserDataFromCsv(MultipartFile file);
 
     void ratingPointsCount(T player);
-
-    void addRatingPointsForWinners(Game game);
 }

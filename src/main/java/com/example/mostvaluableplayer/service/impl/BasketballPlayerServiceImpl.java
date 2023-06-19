@@ -1,13 +1,11 @@
 package com.example.mostvaluableplayer.service.impl;
 
-import com.example.mostvaluableplayer.exception.CustomException;
-import com.example.mostvaluableplayer.model.Game;
+import com.example.mostvaluableplayer.exception.FailedParsingFileException;
 import com.example.mostvaluableplayer.model.player.BasketballPlayer;
 import com.example.mostvaluableplayer.service.PlayerService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,7 +42,7 @@ public class BasketballPlayerServiceImpl implements PlayerService<BasketballPlay
             }
 
         } catch (IOException e) {
-            throw new CustomException("Failed to parse CSV file", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new FailedParsingFileException("Failed to parse CSV file");
         }
 
         return Collections.unmodifiableList(players);
@@ -64,15 +62,7 @@ public class BasketballPlayerServiceImpl implements PlayerService<BasketballPlay
 
     @Override
     public void ratingPointsCount(BasketballPlayer basketballPlayer) {
-        int additionalRatingPoints = basketballPlayer.getScoredPoints() * 2 + basketballPlayer.getRebounds() + basketballPlayer.getAssists();
-        basketballPlayer.setAdditionalRatingPoints(additionalRatingPoints);
-    }
-
-    @Override
-    public void addRatingPointsForWinners(Game game) {
-        game.getPlayers()
-                .stream()
-                .filter(player -> player.getTeamName().equals(game.getWinner().getName()))
-                .forEach(player -> player.setAdditionalRatingPoints(10));
+        int ratingPoints = basketballPlayer.getScoredPoints() * 2 + basketballPlayer.getRebounds() + basketballPlayer.getAssists();
+        basketballPlayer.setRatingPoints(ratingPoints);
     }
 }
