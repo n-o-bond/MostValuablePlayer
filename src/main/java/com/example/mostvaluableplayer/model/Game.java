@@ -1,10 +1,7 @@
 package com.example.mostvaluableplayer.model;
 
 import com.example.mostvaluableplayer.model.player.Player;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,6 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 @NoArgsConstructor
 public class Game {
     private List<Team> teams = new ArrayList<>();

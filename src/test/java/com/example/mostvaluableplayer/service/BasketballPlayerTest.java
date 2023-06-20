@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BasketballPlayerTest {
 
     @Autowired
-    @Qualifier("BasketballPlayerServiceImpl")
+    @Qualifier("basketballPlayerServiceImpl")
     private PlayerService<BasketballPlayer> playerService;
 
     private MultipartFile file;
@@ -53,9 +53,9 @@ class BasketballPlayerTest {
 
     @Test
     void parseNonValidUserDataFromCsv() {
-        InputStream inputStream = BasketballPlayerTest.class.getResourceAsStream("/basketballGameNonValidFail.csv");
+        InputStream inputStream = BasketballPlayerTest.class.getResourceAsStream("/basketballGameInvalidFail.csv");
 
-        assertThrows(FailedParsingFileException.class, () -> playerService.parseUserDataFromCsv(new MockMultipartFile("basketballGameNonValidFail.csv", inputStream)));
+        assertThrows(FailedParsingFileException.class, () -> playerService.parseUserDataFromCsv(new MockMultipartFile("basketballGameInvalidFail.csv", inputStream)));
     }
 
     @Test

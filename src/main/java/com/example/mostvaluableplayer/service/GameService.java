@@ -14,5 +14,4 @@ public interface GameService {
 
     Team determineWinnerTeam(Game game);
 
-    void addAdditionalRatingPoints(Team winner);
 }

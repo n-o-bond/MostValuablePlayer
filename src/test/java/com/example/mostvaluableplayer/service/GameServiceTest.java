@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameServiceTest {
 
     @Autowired
-    @Qualifier("BasketballPlayerServiceImpl")
+    @Qualifier("basketballPlayerServiceImpl")
     private PlayerService<BasketballPlayer> playerService;
 
     @Autowired
@@ -49,7 +49,6 @@ public class GameServiceTest {
         playersTeamB.add(new BasketballPlayer("player 5", "nick5", 23, "Team B", 4, 7, 7, 22));
         playersTeamB.add(new BasketballPlayer("player 6", "nick6", 42, "Team B", 8, 10, 0, 26));
 
-
         expectedTeamA = new Team();
         expectedTeamA.setPlayers(playersTeamA);
         expectedTeamA.setScoredPoints(playersTeamA.stream()
@@ -66,7 +65,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void createValidTeam(){
+    void createValidTeam() {
         List<BasketballPlayer> players = playerService.parseUserDataFromCsv(file);
         Team actualTeamA = gameService.createTeam(players, "Team A");
         Team actualTeamB = gameService.createTeam(players, "Team B");
@@ -76,7 +75,7 @@ public class GameServiceTest {
     }
 
     @Test
-    void createValidGame(){
+    void createValidGame() {
         List<Team> teams = List.of(expectedTeamA, expectedTeamB);
 
         List<BasketballPlayer> players = new ArrayList<>(playersTeamA);
@@ -86,6 +85,7 @@ public class GameServiceTest {
         Game expectedGame = new Game();
         expectedGame.setTeams(teams);
         expectedGame.setPlayers(expectedPlayers);
+        expectedGame.setWinner(expectedTeamB);
 
         Game actualGame = gameService.createGame(teams);
 
@@ -93,13 +93,13 @@ public class GameServiceTest {
     }
 
     @Test
-    void determineWinnerTeam(){
+    void determineWinnerTeam() {
         List<Team> teams = List.of(expectedTeamA, expectedTeamB);
 
         Team expectedWinner = expectedTeamB;
 
         expectedWinner.getPlayers()
-                .forEach(player -> player.setRatingPoints(player.getRatingPoints()+10));
+                .forEach(player -> player.setRatingPoints(player.getRatingPoints() + 10));
 
         Game actualGame = gameService.createGame(teams);
         Team actualWinner = gameService.determineWinnerTeam(actualGame);

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service("GameServiceImpl")
+@Service
 public class GameServiceImpl implements GameService {
 
     public Team createTeam(List<? extends Player> players, String teamName) {
@@ -37,6 +37,7 @@ public class GameServiceImpl implements GameService {
         Game game = new Game();
         game.setTeams(teams);
         game.setPlayers(players);
+        game.setWinner(determineWinnerTeam(game));
         return game;
     }
 
@@ -52,8 +53,7 @@ public class GameServiceImpl implements GameService {
         return winner;
     }
 
-    @Override
-    public void addAdditionalRatingPoints(Team winner) {
+    private void addAdditionalRatingPoints(Team winner) {
         winner.getPlayers()
                 .forEach(player -> player.setRatingPoints(player.getRatingPoints()+10));
     }

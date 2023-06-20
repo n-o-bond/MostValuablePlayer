@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Service("BasketballPlayerServiceImpl")
+@Service
 public class BasketballPlayerServiceImpl implements PlayerService<BasketballPlayer> {
 
     @Override

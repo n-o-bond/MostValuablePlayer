@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Service("HandballPlayerServiceImpl")
+@Service
 public class HandballPlayerServiceImpl implements PlayerService<HandballPlayer> {
     @Override
     public List<HandballPlayer> parseUserDataFromCsv(MultipartFile file) {
