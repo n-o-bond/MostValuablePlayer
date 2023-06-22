@@ -3,13 +3,11 @@ package com.example.mostvaluableplayer.service.impl;
 import com.example.mostvaluableplayer.exception.FailedParsingFileException;
 import com.example.mostvaluableplayer.model.Game;
 import com.example.mostvaluableplayer.model.SportType;
-import com.example.mostvaluableplayer.model.Team;
 import com.example.mostvaluableplayer.model.Tournament;
 import com.example.mostvaluableplayer.model.player.Player;
 import com.example.mostvaluableplayer.service.GameService;
 import com.example.mostvaluableplayer.service.PlayerService;
 import com.example.mostvaluableplayer.service.TournamentService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -20,25 +18,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TournamentServiceImpl implements TournamentService {
-    private final BasketballPlayerServiceImpl basketballPlayerService;
-
-    private final HandballPlayerServiceImpl handballPlayerService;
     private final GameService gameService;
 
-    private final Map<SportType, PlayerService<? extends Player>> playerServices = new HashMap<>();
-
-
-    @PostConstruct
-    private void initializePlayerServices() {
-        playerServices.put(SportType.BASKETBALL, basketballPlayerService);
-        playerServices.put(SportType.HANDBALL, handballPlayerService);
-    }
+    private final List<PlayerService<? extends Player>> playerServices;
 
     @Override
     public Tournament createTournament(List<Game> games) {
@@ -75,34 +66,13 @@ public class TournamentServiceImpl implements TournamentService {
 
         for (MultipartFile file : files) {
             SportType sportType = getHeader(file);
-            List<? extends Player> players = getPlayers(sportType, file);
-            Game game = getGame(players);
-            games.add(game);
+            List<? extends Player> players = playerServices.stream()
+                    .filter(p -> p.getSportType().equals(sportType))
+                    .findFirst().get().parseUserDataFromCsv(file);
+            games.add(gameService.createGameFromPlayers(players));
         }
 
         return createTournament(games);
-    }
-
-    private Game getGame(List<? extends Player> players) {
-        List<String> teamNames = players.stream()
-                .map(Player::getTeamName)
-                .distinct()
-                .toList();
-
-        List<Team> teams = teamNames.stream()
-                .map(name -> gameService.createTeam(players, name))
-                .toList();
-
-        return gameService.createGame(teams);
-    }
-
-    private List<? extends Player> getPlayers(SportType sportType, MultipartFile file) {
-        PlayerService<? extends Player> playerService = playerServices.get(sportType);
-        if (playerService == null) {
-            throw new IllegalArgumentException("Unsupported sport type: " + sportType);
-        }
-
-        return playerService.parseUserDataFromCsv(file);
     }
 
     private SportType getHeader(MultipartFile multipartFile) {

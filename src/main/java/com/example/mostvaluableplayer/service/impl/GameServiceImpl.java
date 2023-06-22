@@ -14,7 +14,33 @@ import java.util.stream.Collectors;
 @Service
 public class GameServiceImpl implements GameService {
 
-    public Team createTeam(List<? extends Player> players, String teamName) {
+    @Override
+    public Game createGameFromPlayers(List<? extends Player> players) {
+        List<String> teamNames = players.stream()
+                .map(Player::getTeamName)
+                .distinct()
+                .toList();
+
+        List<Team> teams = teamNames.stream()
+                .map(name -> createTeam(players, name))
+                .toList();
+
+        return this.createGameFromTeams(teams);
+    }
+
+    private Game createGameFromTeams(List<Team> teams) {
+        Set<? extends Player> players = teams.stream()
+                .flatMap(team -> team.getPlayers().stream())
+                .collect(Collectors.toSet());
+
+        Game game = new Game();
+        game.setTeams(teams);
+        game.setPlayers(players);
+        game.setWinner(determineWinnerTeam(game));
+        return game;
+    }
+
+    private Team createTeam(List<? extends Player> players, String teamName) {
         List<? extends Player> playerList = players.stream()
                 .filter(p -> p.getTeamName().equals(teamName))
                 .toList();
@@ -26,19 +52,6 @@ public class GameServiceImpl implements GameService {
         team.setPlayers(playerList);
         team.setScoredPoints(scoredPoints);
         return team;
-    }
-
-    @Override
-    public Game createGame(List<Team> teams) {
-        Set<? extends Player> players = teams.stream()
-                .flatMap(team -> team.getPlayers().stream())
-                .collect(Collectors.toSet());
-
-        Game game = new Game();
-        game.setTeams(teams);
-        game.setPlayers(players);
-        game.setWinner(determineWinnerTeam(game));
-        return game;
     }
 
     @Override
