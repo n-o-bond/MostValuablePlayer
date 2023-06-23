@@ -4,106 +4,96 @@ import com.example.mostvaluableplayer.model.Game;
 import com.example.mostvaluableplayer.model.Team;
 import com.example.mostvaluableplayer.model.player.BasketballPlayer;
 import com.example.mostvaluableplayer.model.player.Player;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class GameServiceTest {
 
     @Autowired
-    @Qualifier("basketballPlayerServiceImpl")
-    private PlayerService<BasketballPlayer> playerService;
+    private PlayerService<BasketballPlayer> basketballPlayerService;
 
     @Autowired
     private GameService gameService;
 
-    private MultipartFile file;
-    List<BasketballPlayer> playersTeamA;
-    List<BasketballPlayer> playersTeamB;
-    Team expectedTeamA;
-    Team expectedTeamB;
+    @Test
+    public void createGameFromPlayersTest() throws IOException {
+        InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
+        List<BasketballPlayer> basketballPlayers = basketballPlayerService
+                .parseUserDataFromCsv(new MockMultipartFile("basketballGame1.csv", inputStreamForBasketballGame));
 
-    @BeforeEach
-    void setup() throws IOException {
-        InputStream inputStream = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
-        file = new MockMultipartFile("basketballGame1.csv", inputStream);
+        List<BasketballPlayer> playersTeamA = basketballPlayers.stream()
+                .filter(p -> p.getTeamName().equals("Team A"))
+                .toList();
+        List<BasketballPlayer> playersTeamB = basketballPlayers.stream()
+                .filter(p -> p.getTeamName().equals("Team B"))
+                .toList();
 
-        playersTeamA = new ArrayList<>();
-        playersTeamA.add(new BasketballPlayer("player 1", "nick1", 4, "Team A", 10, 2, 7, 29));
-        playersTeamA.add(new BasketballPlayer("player 2", "nick2", 8, "Team A", 0, 10, 0, 10));
-        playersTeamA.add(new BasketballPlayer("player 3", "nick3", 15, "Team A", 15, 10, 4, 44));
-
-        playersTeamB = new ArrayList<>();
-        playersTeamB.add(new BasketballPlayer("player 4", "nick4", 16, "Team B", 20, 0, 0, 40));
-        playersTeamB.add(new BasketballPlayer("player 5", "nick5", 23, "Team B", 4, 7, 7, 22));
-        playersTeamB.add(new BasketballPlayer("player 6", "nick6", 42, "Team B", 8, 10, 0, 26));
-
-        expectedTeamA = new Team();
+        Team expectedTeamA = new Team();
         expectedTeamA.setPlayers(playersTeamA);
         expectedTeamA.setScoredPoints(playersTeamA.stream()
-                .mapToInt(Player::getRatingPoints)
+                .mapToInt(Player::getPointsForTeam)
                 .sum());
         expectedTeamA.setName("Team A");
 
-        expectedTeamB = new Team();
+        Team expectedTeamB = new Team();
         expectedTeamB.setPlayers(playersTeamB);
         expectedTeamB.setScoredPoints(playersTeamB.stream()
-                .mapToInt(Player::getRatingPoints)
+                .mapToInt(Player::getPointsForTeam)
                 .sum());
         expectedTeamB.setName("Team B");
-    }
-
-    @Test
-    void createValidTeam() {
-        List<BasketballPlayer> players = playerService.parseUserDataFromCsv(file);
-        Team actualTeamA = gameService.createTeam(players, "Team A");
-        Team actualTeamB = gameService.createTeam(players, "Team B");
-
-        assertEquals(expectedTeamA, actualTeamA);
-        assertEquals(expectedTeamB, actualTeamB);
-    }
-
-    @Test
-    void createValidGame() {
-        List<Team> teams = List.of(expectedTeamA, expectedTeamB);
-
-        List<BasketballPlayer> players = new ArrayList<>(playersTeamA);
-        players.addAll(playersTeamB);
-        Set<BasketballPlayer> expectedPlayers = new HashSet<>(players);
 
         Game expectedGame = new Game();
-        expectedGame.setTeams(teams);
-        expectedGame.setPlayers(expectedPlayers);
+        expectedGame.setPlayers(new HashSet<>(basketballPlayers));
+        expectedGame.setTeams(List.of(expectedTeamA, expectedTeamB));
         expectedGame.setWinner(expectedTeamB);
 
-        Game actualGame = gameService.createGame(teams);
+        Game actualGame = gameService.createGameFromPlayers(basketballPlayers);
 
         assertEquals(expectedGame, actualGame);
     }
 
     @Test
-    void determineWinnerTeam() {
-        List<Team> teams = List.of(expectedTeamA, expectedTeamB);
+    public void determineWinnerTeamTest() throws IOException {
+        InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
+        List<BasketballPlayer> expectedBasketballPlayers = basketballPlayerService
+                .parseUserDataFromCsv(new MockMultipartFile("basketballGame1.csv", inputStreamForBasketballGame));
 
-        Team expectedWinner = expectedTeamB;
+        List<BasketballPlayer> playersTeamB = expectedBasketballPlayers.stream()
+                .filter(p -> p.getTeamName().equals("Team B"))
+                .toList();
 
-        expectedWinner.getPlayers()
-                .forEach(player -> player.setRatingPoints(player.getRatingPoints() + 10));
+        Team expectedWinner = new Team();
+        expectedWinner.setPlayers(playersTeamB);
+        expectedWinner.setScoredPoints(playersTeamB.stream()
+                .mapToInt(Player::getPointsForTeam)
+                .sum());
+        expectedWinner.setName("Team B");
 
-        Game actualGame = gameService.createGame(teams);
-        Team actualWinner = gameService.determineWinnerTeam(actualGame);
+        playersTeamB.forEach(player -> {
+            int newRating = player.getRatingPoints() + 10;
+            player.setRatingPoints(newRating);
+        });
+
+        InputStream inputStreamForActualGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
+        List<BasketballPlayer> actualBasketballPlayers = basketballPlayerService
+                .parseUserDataFromCsv(new MockMultipartFile("basketballGame1.csv", inputStreamForActualGame));
+
+        Game actualGame = gameService.createGameFromPlayers(actualBasketballPlayers);
+
+        Team actualWinner = actualGame.getWinner();
 
         assertEquals(expectedWinner, actualWinner);
+        assertEquals(playersTeamB.get(0).getRatingPoints(), actualWinner.getPlayers().get(0).getRatingPoints());
+        assertEquals(playersTeamB.get(1), actualWinner.getPlayers().get(1));
     }
 }

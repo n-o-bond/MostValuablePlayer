@@ -23,11 +23,16 @@ public class BasketballPlayerService extends PlayerService<BasketballPlayer> {
         basketballPlayer.setRebounds(Integer.parseInt(record.get(5)));
         basketballPlayer.setAssists(Integer.parseInt(record.get(6)));
         ratingPointsCount(basketballPlayer);
+        pointsForTeamCount(basketballPlayer);
         return basketballPlayer;
     }
 
     protected void ratingPointsCount(BasketballPlayer basketballPlayer) {
         int ratingPoints = basketballPlayer.getScoredPoints() * 2 + basketballPlayer.getRebounds() + basketballPlayer.getAssists();
         basketballPlayer.setRatingPoints(ratingPoints);
+    }
+
+    protected void pointsForTeamCount(BasketballPlayer basketballPlayer) {
+        basketballPlayer.setPointsForTeam(basketballPlayer.getScoredPoints());
     }
 }

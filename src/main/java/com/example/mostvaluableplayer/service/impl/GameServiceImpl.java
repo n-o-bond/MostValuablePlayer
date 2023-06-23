@@ -7,9 +7,8 @@ import com.example.mostvaluableplayer.service.GameService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -25,17 +24,9 @@ public class GameServiceImpl implements GameService {
                 .map(name -> createTeam(players, name))
                 .toList();
 
-        return this.createGameFromTeams(teams);
-    }
-
-    private Game createGameFromTeams(List<Team> teams) {
-        Set<? extends Player> players = teams.stream()
-                .flatMap(team -> team.getPlayers().stream())
-                .collect(Collectors.toSet());
-
         Game game = new Game();
         game.setTeams(teams);
-        game.setPlayers(players);
+        game.setPlayers(new HashSet<>(players));
         game.setWinner(determineWinnerTeam(game));
         return game;
     }
@@ -45,7 +36,7 @@ public class GameServiceImpl implements GameService {
                 .filter(p -> p.getTeamName().equals(teamName))
                 .toList();
         int scoredPoints =  playerList.stream()
-                .mapToInt(Player::getRatingPoints)
+                .mapToInt(Player::getPointsForTeam)
                 .sum();
         Team team = new Team();
         team.setName(teamName);

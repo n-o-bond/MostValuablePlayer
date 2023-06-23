@@ -10,4 +10,6 @@ public abstract class Player {
     protected int number;
     protected String teamName;
     protected int ratingPoints;
+
+    protected int pointsForTeam;
 }

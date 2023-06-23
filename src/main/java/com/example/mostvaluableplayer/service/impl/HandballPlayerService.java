@@ -22,11 +22,16 @@ public class HandballPlayerService extends PlayerService<HandballPlayer> {
         handballPlayer.setGoalsMade(Integer.parseInt(record.get(4)));
         handballPlayer.setGoalsReceived(Integer.parseInt(record.get(5)));
         ratingPointsCount(handballPlayer);
+        pointsForTeamCount(handballPlayer);
         return handballPlayer;
     }
 
     protected void ratingPointsCount(HandballPlayer handballPlayer) {
         int additionalRatingPoints = handballPlayer.getGoalsMade() * 2 - handballPlayer.getGoalsReceived();
         handballPlayer.setRatingPoints(additionalRatingPoints);
+    }
+
+    protected void pointsForTeamCount(HandballPlayer handballPlayer) {
+        handballPlayer.setPointsForTeam(handballPlayer.getGoalsMade());
     }
 }

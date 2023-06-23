@@ -22,6 +22,8 @@ public abstract class PlayerService<T extends Player>{
 
     protected abstract void ratingPointsCount(T player);
 
+    protected abstract void pointsForTeamCount(T player);
+
     public abstract SportType getSportType();
 
     public List<T> parseUserDataFromCsv(MultipartFile file) {
