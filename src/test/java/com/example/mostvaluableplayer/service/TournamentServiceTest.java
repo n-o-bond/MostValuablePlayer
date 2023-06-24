@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-public class TournamentServiceTest {
+class TournamentServiceTest {
     @Autowired
     private TournamentService tournamentService;
     @Autowired
@@ -33,6 +33,7 @@ public class TournamentServiceTest {
 
     @Test
     void createTournamentTest() throws IOException {
+        //GIVEN
         InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
         InputStream inputStreamForHandballGame = BasketballPlayerTest.class.getResourceAsStream("/handballGame1.csv");
         MultipartFile basketballFile = new MockMultipartFile("basketballGame1.csv", inputStreamForBasketballGame);
@@ -48,18 +49,19 @@ public class TournamentServiceTest {
                 .flatMap(game -> game.getPlayers().stream())
                 .toList();
 
-        Tournament expectTournament = new Tournament();
-        expectTournament.setGames(games);
-        expectTournament.setPlayers(allPlayers);
-        expectTournament.setMostValuablePlayer(basketballPlayers.get(2));
-
+        Tournament expectedTournament = new Tournament();
+        expectedTournament.setGames(games);
+        expectedTournament.setPlayers(allPlayers);
+        expectedTournament.setMostValuablePlayer(basketballPlayers.get(2));
+        //WHEN
         Tournament actualTournament = tournamentService.createTournament(games);
-
-        assertEquals(expectTournament, actualTournament);
+        //THEN
+        assertEquals(expectedTournament, actualTournament);
     }
 
     @Test
     void determineMostValuablePlayerTest() throws IOException {
+        //GIVEN
         InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
         InputStream inputStreamForHandballGame = BasketballPlayerTest.class.getResourceAsStream("/handballGame1.csv");
         MultipartFile basketballFile = new MockMultipartFile("basketballGame1.csv", inputStreamForBasketballGame);
@@ -71,13 +73,15 @@ public class TournamentServiceTest {
         allPlayers.addAll(handballPlayers);
 
         Player expectedMVP = basketballPlayers.get(2);
+        //WHEN
         Player actualMVP = tournamentService.determineMostValuablePlayer(allPlayers);
-
+        //THEN
         assertEquals(expectedMVP, actualMVP);
     }
 
     @Test
     void getTournamentFromValidFilesTest() throws IOException {
+        //GIVEN
         List<MultipartFile> filesValidList = new ArrayList<>();
         InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
         InputStream inputStreamForHandballGame = BasketballPlayerTest.class.getResourceAsStream("/handballGame1.csv");
@@ -100,14 +104,15 @@ public class TournamentServiceTest {
         expectedTournament.setGames(games);
         expectedTournament.setPlayers(allPlayers);
         expectedTournament.setMostValuablePlayer(basketballPlayers.get(2));
-
+        //WHEN
         Tournament actualTournament = tournamentService.getTournamentFromFiles(filesValidList);
-
+        //THEN
         assertEquals(expectedTournament, actualTournament);
     }
 
     @Test
     void getTournamentFromInvalidFilesTest() throws IOException {
+        //GIVEN
         List<MultipartFile> filesInvalidList = new ArrayList<>();
         InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
         InputStream inputStreamForHandballGame = BasketballPlayerTest.class.getResourceAsStream("/handballGame1.csv");
@@ -115,7 +120,7 @@ public class TournamentServiceTest {
         filesInvalidList.add(new MockMultipartFile("basketballGame1.csv", inputStreamForBasketballGame));
         filesInvalidList.add(new MockMultipartFile("handballGame1.csv", inputStreamForHandballGame));
         filesInvalidList.add(new MockMultipartFile("/handballGameInValidFile.csv", inputStreamForInvalidGame));
-
+        //WHEN & THEN
         assertThrows(FailedParsingFileException.class, () -> tournamentService.getTournamentFromFiles(filesInvalidList));
     }
 }

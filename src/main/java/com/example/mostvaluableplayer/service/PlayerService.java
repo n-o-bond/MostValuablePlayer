@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class PlayerService<T extends Player>{
+public abstract class PlayerService<T extends Player> {
 
     protected abstract T createPlayerFromCSVRecord(CSVRecord record);
 
@@ -41,9 +41,10 @@ public abstract class PlayerService<T extends Player>{
                 }
             }
             return Collections.unmodifiableList(players);
+        } catch (IllegalArgumentException e) {
+            throw new FailedParsingFileException("Failed to parse CSV file: Illegal CSV record");
         } catch (IOException e) {
             throw new FailedParsingFileException("Failed to access CSV file", e);
         }
     }
 }
-

@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class GameServiceTest {
+class GameServiceTest {
 
     @Autowired
     private PlayerService<BasketballPlayer> basketballPlayerService;
@@ -26,7 +26,8 @@ public class GameServiceTest {
     private GameService gameService;
 
     @Test
-    public void createGameFromPlayersTest() throws IOException {
+    void createGameFromPlayersTest() throws IOException {
+        //GIVEN
         InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
         List<BasketballPlayer> basketballPlayers = basketballPlayerService
                 .parseUserDataFromCsv(new MockMultipartFile("basketballGame1.csv", inputStreamForBasketballGame));
@@ -56,14 +57,15 @@ public class GameServiceTest {
         expectedGame.setPlayers(new HashSet<>(basketballPlayers));
         expectedGame.setTeams(List.of(expectedTeamA, expectedTeamB));
         expectedGame.setWinner(expectedTeamB);
-
+        //WHEN
         Game actualGame = gameService.createGameFromPlayers(basketballPlayers);
-
+        //THEN
         assertEquals(expectedGame, actualGame);
     }
 
     @Test
-    public void determineWinnerTeamTest() throws IOException {
+    void determineWinnerTeamTest() throws IOException {
+        //GIVEN
         InputStream inputStreamForBasketballGame = BasketballPlayerTest.class.getResourceAsStream("/basketballGame1.csv");
         List<BasketballPlayer> expectedBasketballPlayers = basketballPlayerService
                 .parseUserDataFromCsv(new MockMultipartFile("basketballGame1.csv", inputStreamForBasketballGame));
@@ -88,10 +90,10 @@ public class GameServiceTest {
         List<BasketballPlayer> actualBasketballPlayers = basketballPlayerService
                 .parseUserDataFromCsv(new MockMultipartFile("basketballGame1.csv", inputStreamForActualGame));
 
+        //WHEN
         Game actualGame = gameService.createGameFromPlayers(actualBasketballPlayers);
-
         Team actualWinner = actualGame.getWinner();
-
+        //THEN
         assertEquals(expectedWinner, actualWinner);
         assertEquals(playersTeamB.get(0).getRatingPoints(), actualWinner.getPlayers().get(0).getRatingPoints());
         assertEquals(playersTeamB.get(1), actualWinner.getPlayers().get(1));
